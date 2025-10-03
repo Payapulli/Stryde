@@ -3,3 +3,4 @@ uvicorn==0.24.0
 httpx==0.25.2
 python-multipart==0.0.6
 python-jose[cryptography]==3.3.0
+vercel==0.10.0

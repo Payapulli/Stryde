@@ -9,9 +9,10 @@ from typing import Optional
 app = FastAPI()
 
 # CORS middleware to allow frontend to communicate with backend
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Vite default port
+    allow_origins=[FRONTEND_URL],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -20,7 +21,16 @@ app.add_middleware(
 # Strava OAuth configuration
 STRAVA_CLIENT_ID = os.getenv("STRAVA_CLIENT_ID", "your_client_id_here")
 STRAVA_CLIENT_SECRET = os.getenv("STRAVA_CLIENT_SECRET", "your_client_secret_here")
-STRAVA_REDIRECT_URI = "http://localhost:8000/auth/callback"
+
+# Dynamic URL based on environment
+def get_base_url():
+    vercel_url = os.getenv("VERCEL_URL")
+    if vercel_url:
+        return f"https://{vercel_url}"
+    return "http://localhost:8000"
+
+BASE_URL = get_base_url()
+STRAVA_REDIRECT_URI = f"{BASE_URL}/auth/callback"
 
 # In-memory storage for demo (use proper database in production)
 user_sessions = {}
@@ -92,7 +102,7 @@ async def strava_callback(code: str, state: str):
         
         # Redirect to frontend with success
         return RedirectResponse(
-            url=f"http://localhost:5173?auth_success=true&state={state}"
+            url=f"{FRONTEND_URL}?auth_success=true&state={state}"
         )
 
 @app.get("/user/profile")
