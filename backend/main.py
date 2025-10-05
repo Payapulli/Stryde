@@ -12,7 +12,10 @@ app = FastAPI()
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[FRONTEND_URL],
+    allow_origins=[
+        "https://stryde-ochre.vercel.app",       # your production frontend
+        "https://*.vercel.app"                   # allow all preview deployments
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -24,6 +27,11 @@ STRAVA_CLIENT_SECRET = os.getenv("STRAVA_CLIENT_SECRET", "your_client_secret_her
 
 # Dynamic URL based on environment
 def get_base_url():
+    # Use custom BASE_URL if set, otherwise fall back to VERCEL_URL
+    base_url = os.getenv("BASE_URL")
+    if base_url:
+        return base_url
+    
     vercel_url = os.getenv("VERCEL_URL")
     if vercel_url:
         return f"https://{vercel_url}"

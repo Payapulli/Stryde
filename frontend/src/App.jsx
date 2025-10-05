@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 
-// Get API URL from environment variable or default to localhost
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+// Get API URL from environment variable or default to backend
+const API_URL = import.meta.env.VITE_API_URL || 'https://backend-joshua-payapullis-projects.vercel.app'
+console.log('API_URL:', API_URL, 'VITE_API_URL:', import.meta.env.VITE_API_URL)
 
 function App() {
   const [message, setMessage] = useState('')
