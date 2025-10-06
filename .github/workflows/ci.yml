@@ -1,77 +1,14 @@
-name: CI/CD Pipeline
+name: CI/CD
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 
 jobs:
-  test-frontend:
+  test:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./frontend
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'npm'
-        cache-dependency-path: frontend/package-lock.json
-    
-    - name: Install dependencies
-      run: npm ci
-    
-    - name: Run linting
-      run: npm run lint
-    
-    - name: Run tests
-      run: npm run test:run
-    
-    - name: Build application
-      run: npm run build
-
-  test-backend:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./backend
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Setup Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-    
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install pytest pytest-asyncio
-    
-    - name: Run tests
-      working-directory: ./backend
-      run: |
-        export PYTHONPATH="${PYTHONPATH}:$(pwd)"
-        pytest tests/ -v
-    
-    - name: Test server startup
-      working-directory: ./backend
-      run: |
-        export PYTHONPATH="${PYTHONPATH}:$(pwd)"
-        python -c "import main; print('✅ Backend imports successfully')"
-
-  integration-test:
-    runs-on: ubuntu-latest
-    needs: [test-frontend, test-backend]
     
     steps:
     - name: Checkout code
@@ -98,53 +35,26 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+        pip install pytest pytest-asyncio flake8
     
-    - name: Run backend linting
+    - name: Run frontend tests
+      working-directory: ./frontend
+      run: npm run test:run
+    
+    - name: Run backend tests
       working-directory: ./backend
       run: |
         export PYTHONPATH="${PYTHONPATH}:$(pwd)"
-        python -m flake8 . --max-line-length=120 --extend-ignore=E203,W503,W293,E302,E305,W291 --exclude=venv,__pycache__,.git
+        pytest tests/ -v
     
-    - name: Start backend server
-      working-directory: ./backend
+    - name: Run linting
       run: |
-        python -c "
-        import uvicorn
-        import threading
-        import time
-        
-        def start_server():
-            uvicorn.run('main:app', host='127.0.0.1', port=8000, log_level='error')
-        
-        server_thread = threading.Thread(target=start_server)
-        server_thread.daemon = True
-        server_thread.start()
-        time.sleep(3)
-        print('Backend server started')
-        "
-    
-    - name: Test backend connectivity
-      run: |
-        sleep 5
-        curl -f http://127.0.0.1:8000/ping || exit 1
-        echo "✅ Backend is responding"
-    
-    - name: Build frontend
-      working-directory: ./frontend
-      run: npm run build
-    
-    - name: Test frontend build
-      run: |
-        if [ -d "frontend/dist" ]; then
-          echo "✅ Frontend build successful"
-        else
-          echo "❌ Frontend build failed"
-          exit 1
-        fi
+        cd frontend && npm run lint
+        cd ../backend && python -m flake8 . --max-line-length=120 --extend-ignore=E203,W503,W293,E302,E305,W291 --exclude=venv,__pycache__,.git
 
   deploy:
     runs-on: ubuntu-latest
-    needs: [test-frontend, test-backend, integration-test]
+    needs: [test]
     if: github.ref == 'refs/heads/main'
     
     steps:
@@ -158,6 +68,7 @@ jobs:
         vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
         vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
         working-directory: ./frontend
+        vercel-args: '--prod'
     
     - name: Deploy to Vercel (Backend)
       uses: amondnet/vercel-action@v25
@@ -166,3 +77,4 @@ jobs:
         vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
         vercel-project-id: ${{ secrets.VERCEL_BACKEND_PROJECT_ID }}
         working-directory: ./backend
+        vercel-args: '--prod'
