@@ -59,6 +59,16 @@ STRAVA_REDIRECT_URI = get_strava_redirect_uri()
 # In-memory storage for demo (use proper database in production)
 user_sessions = {}
 
+@app.get("/oauth/authorize")
+async def oauth_authorize(code: str = None, state: str = None):
+    """Handle Strava OAuth redirect to /oauth/authorize (incorrect redirect)"""
+    if code and state:
+        # This is actually a callback, redirect to our callback handler
+        return await strava_callback(code, state)
+    else:
+        # No parameters, redirect to frontend
+        return RedirectResponse(url="https://stryde-ochre.vercel.app")
+
 @app.get("/ping")
 async def ping():
     return {"message": "pong"}
