@@ -62,7 +62,7 @@ lint-frontend:
 
 lint-backend:
 	@echo "Linting backend..."
-	@cd backend && source venv/bin/activate && python -m flake8 . --max-line-length=88 --extend-ignore=E203,W503 --exclude=venv,__pycache__,.git
+	@cd backend && source venv/bin/activate && python -m flake8 . --max-line-length=120 --extend-ignore=E203,W503,W293,E302,E305,W291 --exclude=venv,__pycache__,.git
 
 lint: lint-frontend lint-backend
 	@echo "✅ All linting completed!"

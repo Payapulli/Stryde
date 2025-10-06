@@ -1,10 +1,9 @@
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 import httpx
 import os
 import secrets
-from typing import Optional
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -190,7 +189,10 @@ async def fetch_user_activities(access_token: str, max_pages: int = 10) -> list:
             print(f"📊 Strava API response: {response.status_code}")
             if response.status_code != 200:
                 print(f"❌ Strava API error: {response.text}")
-                raise HTTPException(status_code=400, detail=f"Failed to fetch activities: {response.status_code} - {response.text}")
+                raise HTTPException(
+                    status_code=400, 
+                    detail=f"Failed to fetch activities: {response.status_code} - {response.text}"
+                )
             
             activities_batch = response.json()
             print(f"📈 Got {len(activities_batch)} activities on page {page}")
@@ -206,7 +208,6 @@ async def fetch_user_activities(access_token: str, max_pages: int = 10) -> list:
 def calculate_weekly_volume(running_activities: list) -> dict:
     """Calculate weekly training volume"""
     from datetime import datetime, timedelta
-    import calendar
     
     weekly_data = {}
     
@@ -300,45 +301,8 @@ def calculate_best_efforts(running_activities: list) -> dict:
                 "time_minutes": round(best_time / 60, 2),
                 "elapsed_time": best_time,
                 "distance": distance,
-                "name": f"Best {get_distance_name(distance)}",
+                "name": f"Best {distance}m",
                 "start_date": best_activity.get("start_date", "")
             }
     
     return best_efforts
-
-def calculate_percentiles(best_efforts: dict) -> dict:
-    """Calculate percentiles for best efforts"""
-    percentiles = {}
-    
-    for distance, effort_data in best_efforts.items():
-        time_minutes = effort_data["time_minutes"]
-        distance_percentiles = PERCENTILE_DATA[distance]
-        
-        # Find which percentile this time falls into
-        percentile = 0
-        for pct, time_threshold in sorted(distance_percentiles.items()):
-            if time_minutes <= time_threshold:
-                percentile = pct
-                break
-        
-        percentiles[distance] = {
-            "time_minutes": time_minutes,
-            "percentile": percentile,
-            "distance_name": get_distance_name(distance),
-            "effort_name": effort_data["name"],
-            "date": effort_data["start_date"]
-        }
-    
-    return percentiles
-
-def get_distance_name(distance_meters):
-    """Convert distance in meters to human-readable name"""
-    distance_map = {
-        1609: "1 Mile",
-        5000: "5K", 
-        10000: "10K",
-        15000: "15K",
-        21097.5: "Half Marathon",
-        42195: "Full Marathon"
-    }
-    return distance_map.get(distance_meters, f"{distance_meters}m")
