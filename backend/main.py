@@ -45,7 +45,7 @@ def get_strava_redirect_uri():
     """Get Strava redirect URI - use localhost for local dev, production for deployed"""
     # Use BASE_URL if explicitly set, otherwise use localhost for local dev
     if os.getenv("BASE_URL"):
-        return f"{BASE_URL}/auth/callback"
+        return f"{get_base_url()}/auth/callback"
     elif os.getenv("VERCEL_URL"):
         return f"https://{os.getenv('VERCEL_URL')}/auth/callback"
     else:
