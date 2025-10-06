@@ -13,6 +13,9 @@ help:
 	@echo "  test-frontend    - Run frontend unit tests"
 	@echo "  test-all         - Run all unit tests"
 	@echo "  test-integration - Test running endpoints"
+	@echo "  lint-backend     - Lint backend code"
+	@echo "  lint-frontend    - Lint frontend code"
+	@echo "  lint             - Lint all code"
 	@echo "  clean            - Clean up processes"
 
 install-backend:
@@ -52,6 +55,17 @@ test-frontend:
 
 test-all: test-backend test-frontend
 	@echo "✅ All tests completed!"
+
+lint-frontend:
+	@echo "Linting frontend..."
+	@cd frontend && npm run lint
+
+lint-backend:
+	@echo "Linting backend..."
+	@cd backend && source venv/bin/activate && python -m flake8 . --max-line-length=88 --extend-ignore=E203,W503 --exclude=venv,__pycache__,.git
+
+lint: lint-frontend lint-backend
+	@echo "✅ All linting completed!"
 
 test-integration:
 	@echo "Testing backend endpoints..."
