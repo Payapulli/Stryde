@@ -166,10 +166,6 @@ function App() {
                     </div>
                   </div>
                   <div className="card">
-                    <h3>Runs This Month</h3>
-                    <div className="value">{fitnessData.monthly_volume[0]?.runs || 0}</div>
-                  </div>
-                  <div className="card">
                     <h3>Distance This Month</h3>
                     <div className="value">
                       {fitnessData.monthly_volume[0]?.distance_km.toFixed(1) || '0.0'} km
