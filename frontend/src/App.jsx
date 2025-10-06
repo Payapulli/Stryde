@@ -8,7 +8,7 @@ function App() {
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
   const [user, setUser] = useState(null)
-  const [authState, setAuthState] = useState(null)
+  const [, setAuthState] = useState(null)
   const [fitnessData, setFitnessData] = useState(null)
   const [fitnessLoading, setFitnessLoading] = useState(false)
 
@@ -18,7 +18,7 @@ function App() {
       const response = await fetch(`${API_URL}/ping`)
       const data = await response.json()
       setMessage(data.message)
-    } catch (error) {
+    } catch {
       setMessage('Error connecting to backend')
     } finally {
       setLoading(false)
