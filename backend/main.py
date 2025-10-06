@@ -47,7 +47,8 @@ def get_strava_redirect_uri():
     if os.getenv("BASE_URL"):
         return f"{get_base_url()}/auth/callback"
     elif os.getenv("VERCEL_URL"):
-        return f"https://{os.getenv('VERCEL_URL')}/auth/callback"
+        # For Vercel, use the domain without the full path for Strava compatibility
+        return f"https://{os.getenv('VERCEL_URL')}"
     else:
         # Local development - use localhost
         return "http://localhost:8000/auth/callback"
