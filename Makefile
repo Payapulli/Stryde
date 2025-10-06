@@ -69,10 +69,10 @@ lint: lint-frontend lint-backend
 
 test-integration:
 	@echo "Testing backend endpoints..."
-	@curl -s http://localhost:8000/ping | grep -q "pong" && echo "✅ Backend ping: OK" || echo "❌ Backend ping: FAILED"
-	@curl -s http://localhost:8000/docs > /dev/null && echo "✅ Backend docs: OK" || echo "❌ Backend docs: FAILED"
+	@curl -s http://127.0.0.1:8000/ping | grep -q "pong" && echo "✅ Backend ping: OK" || echo "❌ Backend ping: FAILED"
+	@curl -s http://127.0.0.1:8000/docs > /dev/null && echo "✅ Backend docs: OK" || echo "❌ Backend docs: FAILED"
 	@echo "Testing frontend..."
-	@curl -s http://localhost:5173 > /dev/null && echo "✅ Frontend: OK" || echo "❌ Frontend: FAILED"
+	@curl -s http://127.0.0.1:5173 > /dev/null && echo "✅ Frontend: OK" || echo "❌ Frontend: FAILED"
 
 clean:
 	@echo "Cleaning up processes..."
