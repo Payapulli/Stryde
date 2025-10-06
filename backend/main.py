@@ -41,20 +41,7 @@ def get_base_url():
         return f"https://{vercel_url}"
     return "http://localhost:8000"
 
-def get_strava_redirect_uri():
-    """Get Strava redirect URI - use localhost for local dev, production for deployed"""
-    # Use BASE_URL if explicitly set, otherwise use localhost for local dev
-    if os.getenv("BASE_URL"):
-        return f"{get_base_url()}/auth/callback"
-    elif os.getenv("VERCEL_URL"):
-        # For Vercel, use just the domain for Strava compatibility
-        return f"https://{os.getenv('VERCEL_URL')}/auth/callback"
-    else:
-        # Local development - use localhost
-        return "http://localhost:8000/auth/callback"
-
 BASE_URL = get_base_url()
-STRAVA_REDIRECT_URI = get_strava_redirect_uri()
 
 # In-memory storage for demo (use proper database in production)
 user_sessions = {}

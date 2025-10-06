@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+const API_URL = import.meta.env.VITE_API_URL || 'https://backend-joshua-payapullis-projects.vercel.app'
 console.log('API_URL:', API_URL, 'VITE_API_URL:', import.meta.env.VITE_API_URL)
 
 function App() {
@@ -163,6 +163,16 @@ function App() {
                     <h3>Distance This Week</h3>
                     <div className="value">
                       {fitnessData.weekly_volume[0]?.distance_km.toFixed(1) || '0.0'} km
+                    </div>
+                  </div>
+                  <div className="card">
+                    <h3>Runs This Month</h3>
+                    <div className="value">{fitnessData.monthly_volume[0]?.runs || 0}</div>
+                  </div>
+                  <div className="card">
+                    <h3>Distance This Month</h3>
+                    <div className="value">
+                      {fitnessData.monthly_volume[0]?.distance_km.toFixed(1) || '0.0'} km
                     </div>
                   </div>
                 </div>
