@@ -48,7 +48,7 @@ def get_strava_redirect_uri():
         return f"{get_base_url()}/auth/callback"
     elif os.getenv("VERCEL_URL"):
         # For Vercel, use just the domain for Strava compatibility
-        return f"https://{os.getenv('VERCEL_URL')}"
+        return f"https://{os.getenv('VERCEL_URL')}/auth/callback"
     else:
         # Local development - use localhost
         return "http://localhost:8000/auth/callback"
@@ -58,16 +58,6 @@ STRAVA_REDIRECT_URI = get_strava_redirect_uri()
 
 # In-memory storage for demo (use proper database in production)
 user_sessions = {}
-
-@app.get("/")
-async def root(code: str = None, state: str = None):
-    """Root route - handle Strava OAuth callback or redirect to frontend"""
-    if code and state:
-        # This is a Strava OAuth callback
-        return await strava_callback(code, state)
-    else:
-        # Regular root access - redirect to frontend
-        return RedirectResponse(url="https://stryde-ochre.vercel.app")
 
 @app.get("/ping")
 async def ping():
