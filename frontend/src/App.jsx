@@ -69,11 +69,11 @@ function App() {
 
   useEffect(() => {
     fetchPing()
-
+    
     const urlParams = new URLSearchParams(window.location.search)
     const authSuccess = urlParams.get('auth_success')
     const state = urlParams.get('state')
-
+    
     if (authSuccess === 'true' && state) {
       setAuthState(state)
       fetchUserProfile(state)
@@ -104,19 +104,19 @@ function App() {
       }}>
         {/* Header */}
         <div className="header">
-          <h1>Stryde</h1>
+      <h1>Stryde</h1>
           <p>Your Personal Running Coach</p>
         </div>
-
+      
         {/* Backend Status */}
         <div className="section" style={{ textAlign: 'center', width: '100%', maxWidth: '100%' }}>
-          <button onClick={fetchPing} disabled={loading}>
-            {loading ? 'Loading...' : 'Ping Backend'}
-          </button>
+        <button onClick={fetchPing} disabled={loading}>
+          {loading ? 'Loading...' : 'Ping Backend'}
+        </button>
           <p style={{ marginTop: 15, color: '#aaa' }}>
             Backend response: <strong style={{ color: '#ff6b35' }}>{message}</strong>
           </p>
-        </div>
+      </div>
 
         {/* Logged in content */}
         {user ? (
@@ -124,10 +124,10 @@ function App() {
             {/* Welcome Card */}
             <div className="section" style={{ textAlign: 'center', width: '100%', maxWidth: '100%' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '20px', flexWrap: 'wrap' }}>
-                {user.profile_medium && (
-                  <img
-                    src={user.profile_medium}
-                    alt="Profile"
+            {user.profile_medium && (
+              <img 
+                src={user.profile_medium} 
+                alt="Profile" 
                     style={{
                       width: 80,
                       height: 80,
@@ -212,10 +212,8 @@ function App() {
                   </div>
                 </div>
               </div>
-            )}
 
-            {/* Weekly Volume */}
-            {fitnessData && (
+              {/* Weekly Volume */}
               <div className="section">
                 <h3 style={{ textAlign: 'center', marginBottom: '24px' }}>Weekly Volume (Last 8 weeks)</h3>
                 <div className="card-grid">
@@ -246,10 +244,8 @@ function App() {
                   ))}
                 </div>
               </div>
-            )}
 
-            {/* Monthly Volume */}
-            {fitnessData && (
+              {/* Monthly Volume */}
               <div className="section">
                 <h3 style={{ textAlign: 'center', marginBottom: '24px' }}>Monthly Volume (Last 6 months)</h3>
                 <div className="card-grid">
@@ -280,7 +276,6 @@ function App() {
                   ))}
                 </div>
               </div>
-            )}
               </>
             )}
 
@@ -316,7 +311,7 @@ function App() {
                   <div style={{ textAlign: 'center', color: '#888' }}>
                     {fitnessData.calendar?.error ? (
                       <div>
-                        <p>❌ {fitnessData.calendar.error}</p>
+                        <p>{fitnessData.calendar.error}</p>
                         <p style={{ fontSize: '14px' }}>{fitnessData.calendar.message}</p>
                       </div>
                     ) : (
@@ -332,7 +327,7 @@ function App() {
               <div className="section" style={{ textAlign: 'center', width: '100%', maxWidth: '100%' }}>
                 <div style={{ fontSize: '1.5rem', color: '#ff6b35', marginBottom: '10px' }}>⏳</div>
                 <p style={{ color: '#888' }}>Loading your training data...</p>
-              </div>
+          </div>
             )}
           </>
         ) : (
