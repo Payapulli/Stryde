@@ -11,6 +11,7 @@ function App() {
   const [, setAuthState] = useState(null)
   const [fitnessData, setFitnessData] = useState(null)
   const [fitnessLoading, setFitnessLoading] = useState(false)
+  const [currentView, setCurrentView] = useState('overview') // 'overview' or 'calendar'
 
   const fetchPing = async () => {
     setLoading(true)
@@ -146,8 +147,46 @@ function App() {
               </div>
             </div>
 
-            {/* Training Overview */}
-            {fitnessData && (
+            {/* Tab Navigation */}
+            <div className="section" style={{ textAlign: 'center', width: '100%', maxWidth: '100%' }}>
+              <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+                <button
+                  onClick={() => setCurrentView('overview')}
+                  style={{
+                    background: currentView === 'overview' ? '#ff6b35' : '#2b2b2b',
+                    border: 'none',
+                    color: 'white',
+                    padding: '10px 20px',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    fontSize: '1rem',
+                    fontWeight: '600'
+                  }}
+                >
+                  Overview
+                </button>
+                <button
+                  onClick={() => setCurrentView('calendar')}
+                  style={{
+                    background: currentView === 'calendar' ? '#ff6b35' : '#2b2b2b',
+                    border: 'none',
+                    color: 'white',
+                    padding: '10px 20px',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    fontSize: '1rem',
+                    fontWeight: '600'
+                  }}
+                >
+                  AI Calendar
+                </button>
+              </div>
+            </div>
+
+            {/* Overview Tab Content */}
+            {currentView === 'overview' && fitnessData && (
+              <>
+                {/* Training Overview */}
               <div className="section">
                 <h3 style={{ textAlign: 'center', marginBottom: '24px' }}>Training Overview</h3>
                 <div className="card-grid">
@@ -240,6 +279,51 @@ function App() {
                     </div>
                   ))}
                 </div>
+              </div>
+            )}
+              </>
+            )}
+
+            {/* Calendar Tab Content */}
+            {currentView === 'calendar' && fitnessData && (
+              <div className="section">
+                <h3 style={{ textAlign: 'center', marginBottom: '24px' }}>AI Training Calendar</h3>
+                {fitnessData.calendar && !fitnessData.calendar.error ? (
+                  <div>
+                    <div style={{ textAlign: 'center', marginBottom: '20px', color: '#888' }}>
+                      Week of {fitnessData.calendar.week_of}
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
+                      {fitnessData.calendar.days.map((day, index) => (
+                        <div key={index} className="card" style={{ textAlign: 'left' }}>
+                          <h3 style={{ color: '#ff6b35', marginBottom: '10px' }}>
+                            {day.day}
+                          </h3>
+                          <div style={{ fontSize: '12px', color: '#888', marginBottom: '10px' }}>
+                            {day.date}
+                          </div>
+                          <div style={{ fontSize: '1.1rem', fontWeight: '600', color: 'white', marginBottom: '10px' }}>
+                            {day.workout}
+                          </div>
+                          <div style={{ fontSize: '14px', color: '#888', fontStyle: 'italic' }}>
+                            {day.reason}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{ textAlign: 'center', color: '#888' }}>
+                    {fitnessData.calendar?.error ? (
+                      <div>
+                        <p>❌ {fitnessData.calendar.error}</p>
+                        <p style={{ fontSize: '14px' }}>{fitnessData.calendar.message}</p>
+                      </div>
+                    ) : (
+                      <p>No calendar data available</p>
+                    )}
+                  </div>
+                )}
               </div>
             )}
 
