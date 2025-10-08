@@ -53,13 +53,15 @@ function App() {
     if (!state) return
     setFitnessLoading(true)
     try {
-      const response = await fetch(`${API_URL}/training/volume?state=${state}`)
-      if (response.ok) {
-        const trainingData = await response.json()
-        setFitnessData(trainingData)
-      } else {
-        console.error('Failed to fetch training data:', response.statusText)
-      }
+        const response = await fetch(`${API_URL}/training/volume?state=${state}`)
+        if (response.ok) {
+          const trainingData = await response.json()
+          console.log('🔍 DEBUG: Training data received:', trainingData)
+          console.log('🔍 DEBUG: Calendar data:', trainingData.calendar)
+          setFitnessData(trainingData)
+        } else {
+          console.error('❌ DEBUG: Failed to fetch training data:', response.status, response.statusText)
+        }
     } catch (error) {
       console.error('Error fetching training volume:', error)
     } finally {

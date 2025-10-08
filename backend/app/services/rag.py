@@ -5,11 +5,19 @@ from openai import OpenAI
 
 def generate_training_recommendations(running_activities: List[Dict[str, Any]]):
     """Generate personalized training calendar using simplified AI analysis"""
+    print(f"🔍 DEBUG: RAG service called with {len(running_activities)} activities")
+    
     if not running_activities:
+        print("❌ DEBUG: No running activities provided")
         return {"error": "No training data available"}
     
     # Check if OpenAI API key is configured
-    if not os.getenv("OPENAI_API_KEY") or os.getenv("OPENAI_API_KEY") == "your_openai_api_key_here":
+    api_key = os.getenv("OPENAI_API_KEY")
+    print(f"🔑 DEBUG: API key present: {bool(api_key)}")
+    print(f"🔑 DEBUG: API key starts with: {api_key[:10] if api_key else 'None'}...")
+    
+    if not api_key or api_key == "your_openai_api_key_here":
+        print("❌ DEBUG: API key not configured or using placeholder")
         return {
             "error": "OpenAI API key not configured",
             "message": "Calendar generation requires OpenAI API key"
@@ -35,8 +43,11 @@ def generate_training_recommendations(running_activities: List[Dict[str, Any]]):
             avg_pace_min_km = sum(paces) / len(paces)
             historical_summary += f"Average pace: {avg_pace_min_km:.1f} min/km\n"
         
-        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        # Generate recommendations using GPT
+        print(f"🤖 DEBUG: Creating OpenAI client with API key...")
+        client = OpenAI(api_key=api_key)
         
+        print(f"📝 DEBUG: Sending prompt to OpenAI...")
         prompt = f"""
         Based on this runner's training data, generate a personalized weekly training calendar.
         
@@ -99,17 +110,24 @@ def generate_training_recommendations(running_activities: List[Dict[str, Any]]):
         }}
         """
         
+        print(f"🚀 DEBUG: Making API call to OpenAI...")
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.7
         )
         
+        print(f"✅ DEBUG: OpenAI API call successful!")
+        print(f"📄 DEBUG: Response received: {len(response.choices[0].message.content)} characters")
+        
         try:
             recommendations = json.loads(response.choices[0].message.content)
+            print(f"🎉 DEBUG: Successfully parsed JSON response")
             return recommendations
-        except json.JSONDecodeError:
+        except json.JSONDecodeError as e:
+            print(f"❌ DEBUG: JSON parsing failed: {e}")
             return {"error": "Failed to generate recommendations"}
     
     except Exception as e:
+        print(f"💥 DEBUG: Exception occurred: {type(e).__name__}: {str(e)}")
         return {"error": f"AI system error: {str(e)}"}
