@@ -34,20 +34,34 @@ async def fetch_user_activities(access_token: str, max_pages: int = 10) -> List[
 
 async def exchange_code_for_token(code: str) -> Dict[str, Any]:
     """Exchange Strava authorization code for access token"""
+    print(f"🔍 DEBUG: Exchanging code for token - code: {code[:10]}...")
+    
+    client_id = os.getenv("STRAVA_CLIENT_ID")
+    client_secret = os.getenv("STRAVA_CLIENT_SECRET")
+    
+    print(f"🔑 DEBUG: Client ID present: {bool(client_id)}")
+    print(f"🔑 DEBUG: Client Secret present: {bool(client_secret)}")
+    print(f"🔑 DEBUG: Client ID value: {client_id}")
+    print(f"🔑 DEBUG: Client Secret starts with: {client_secret[:5] if client_secret else 'None'}...")
+    
     async with httpx.AsyncClient() as client:
         response = await client.post(
             "https://www.strava.com/oauth/token",
             data={
-                "client_id": os.getenv("STRAVA_CLIENT_ID"),
-                "client_secret": os.getenv("STRAVA_CLIENT_SECRET"),
+                "client_id": client_id,
+                "client_secret": client_secret,
                 "code": code,
                 "grant_type": "authorization_code"
             }
         )
         
+        print(f"📡 DEBUG: Token exchange response: {response.status_code}")
+        
         if response.status_code == 200:
+            print(f"✅ DEBUG: Token exchange successful")
             return response.json()
         else:
+            print(f"❌ DEBUG: Token exchange failed: {response.text}")
             raise Exception(f"Token exchange failed: {response.status_code} - {response.text}")
 
 async def fetch_strava_user(access_token: str) -> Dict[str, Any]:
