@@ -42,7 +42,7 @@ async def exchange_code_for_token(code: str) -> Dict[str, Any]:
     print(f"🔑 DEBUG: Client ID present: {bool(client_id)}")
     print(f"🔑 DEBUG: Client Secret present: {bool(client_secret)}")
     print(f"🔑 DEBUG: Client ID value: {client_id}")
-    print(f"🔑 DEBUG: Client Secret starts with: {client_secret[:5] if client_secret else 'None'}...")
+    print(f"🔑 DEBUG: Client Secret: {client_secret[:5] if client_secret else 'None'}...")
     
     async with httpx.AsyncClient() as client:
         response = await client.post(
