@@ -8,6 +8,16 @@ load_dotenv(override=True)
 
 app = FastAPI()
 
+@app.get("/debug/env-vars")
+def debug_env_vars():
+    return {
+        "environment": os.getenv("VERCEL_ENV", "unknown"),
+        "project": os.getenv("VERCEL_PROJECT_PRODUCTION_URL", "unknown"),
+        "client_id": os.getenv("STRAVA_CLIENT_ID"),
+        "client_secret_prefix": os.getenv("STRAVA_CLIENT_SECRET", "")[:5],
+        "openai_key_prefix": os.getenv("OPENAI_API_KEY", "")[:5],
+    }
+
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
