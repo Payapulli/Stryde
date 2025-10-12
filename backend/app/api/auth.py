@@ -23,6 +23,7 @@ async def strava_auth():
     """Initiate Strava OAuth flow"""
     state = secrets.token_urlsafe(32)
     user_sessions[state] = {"authenticated": False}
+    print(f"🔍 DEBUG: Auth initiated - state: {state[:10]}..., sessions count: {len(user_sessions)}")
     
     auth_url = (
         f"https://www.strava.com/oauth/authorize?"
@@ -38,7 +39,13 @@ async def strava_auth():
 @router.get("/auth/callback")
 async def strava_callback(code: str = Query(...), state: str = Query(...)):
     """Handle Strava OAuth callback"""
+    print(f"🔍 DEBUG: Auth callback - state: {state[:10]}..., code: {code[:10]}...")
+    print(f"🔍 DEBUG: User sessions count: {len(user_sessions)}")
+    print(f"🔍 DEBUG: State in sessions: {state in user_sessions}")
+    
     if state not in user_sessions:
+        print(f"DEBUG: Invalid state - not found in sessions")
+        print(f"DEBUG: Available states: {list(user_sessions.keys())}")
         raise HTTPException(status_code=400, detail="Invalid state")
     
     try:
