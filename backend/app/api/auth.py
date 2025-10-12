@@ -15,7 +15,8 @@ def get_strava_redirect_uri():
     if os.getenv("VERCEL_URL") is None:
         return "http://localhost:8000/auth/callback"
     else:
-        return "https://backend-joshua-payapullis-projects.vercel.app/auth/callback"
+        # Use the stable production URL
+        return "https://backend-beta-ebon-86.vercel.app/auth/callback"
 
 @router.get("/auth/strava")
 async def strava_auth():
