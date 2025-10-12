@@ -49,11 +49,15 @@ function App() {
     }
   }
 
-  const fetchTrainingVolume = async (state) => {
+  const fetchTrainingVolume = async (state, accessToken) => {
     if (!state) return
     setFitnessLoading(true)
     try {
-        const response = await fetch(`${API_URL}/training/volume?state=${state}`)
+        const url = accessToken 
+          ? `${API_URL}/training/volume?state=${state}&access_token=${accessToken}`
+          : `${API_URL}/training/volume?state=${state}`
+        console.log('🔍 DEBUG: Fetching training volume with URL:', url)
+        const response = await fetch(url)
         if (response.ok) {
           const trainingData = await response.json()
           console.log('🔍 DEBUG: Training data received:', trainingData)
@@ -75,11 +79,14 @@ function App() {
     const urlParams = new URLSearchParams(window.location.search)
     const authSuccess = urlParams.get('auth_success')
     const state = urlParams.get('state')
+    const accessToken = urlParams.get('access_token')
+    
+    console.log('🔍 DEBUG: URL params - authSuccess:', authSuccess, 'state:', state, 'accessToken:', accessToken ? 'present' : 'missing')
     
     if (authSuccess === 'true' && state) {
       setAuthState(state)
       fetchUserProfile(state)
-      fetchTrainingVolume(state)
+      fetchTrainingVolume(state, accessToken)
       window.history.replaceState({}, document.title, window.location.pathname)
     }
   }, [])
