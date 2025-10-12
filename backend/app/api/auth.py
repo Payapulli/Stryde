@@ -56,9 +56,9 @@ async def strava_callback(code: str = Query(...), state: str = Query(...)):
             "athlete": user_data
         }
         
-        # Redirect to frontend with success
+        # Redirect to frontend with success and access token
         frontend_url = os.getenv("FRONTEND_URL", "https://frontend-beta-sandy-87.vercel.app")
-        return RedirectResponse(url=f"{frontend_url}?auth_success=true&state={state}")
+        return RedirectResponse(url=f"{frontend_url}?auth_success=true&state={state}&access_token={access_token}")
         
     except Exception as e:
         print(f"OAuth error: {e}")

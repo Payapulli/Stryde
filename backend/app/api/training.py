@@ -7,18 +7,20 @@ from ..services.rag import generate_training_recommendations
 router = APIRouter()
 
 @router.get("/training/volume")
-async def get_training_volume(state: str = Query(...)):
+async def get_training_volume(state: str = Query(...), access_token: str = Query(None)):
     """Get user's training volume analysis (weekly and monthly)"""
-    # Check authentication
-    if state not in user_sessions or not user_sessions[state]["authenticated"]:
+    # Check authentication - either from session or direct token
+    if access_token:
+        # Direct token provided (from URL parameter)
+        token = access_token
+    elif state in user_sessions and user_sessions[state]["authenticated"]:
+        # Session-based authentication
+        token = user_sessions[state]["access_token"]
+    else:
         raise HTTPException(status_code=401, detail="Not authenticated")
     
-    # Get user session data
-    user_session = user_sessions[state]
-    access_token = user_session["access_token"]
-    
     # Fetch activities from Strava
-    activities = await fetch_user_activities(access_token)
+    activities = await fetch_user_activities(token)
     running_activities = [act for act in activities if act.get("type") == "Run"]
     
     # Calculate training volume by week and month
