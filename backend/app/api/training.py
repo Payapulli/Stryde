@@ -36,7 +36,11 @@ async def get_training_volume(state: str = Query(...), access_token: str = Query
     monthly_volume = calculate_monthly_volume(running_activities)
     
     # Generate personalized training calendar using RAG
-    calendar = generate_training_recommendations(running_activities)
+    try:
+        calendar = generate_training_recommendations(running_activities)
+    except Exception as e:
+        print(f"⚠️ DEBUG: AI calendar generation failed: {e}")
+        calendar = {"error": "AI service temporarily unavailable", "message": str(e)}
     
     return {
         "total_activities": len(running_activities),
