@@ -4,8 +4,8 @@ import httpx
 from typing import List, Dict, Any
 from openai import OpenAI
 
-# Hugging Face configuration
-HF_MODEL = "mistralai/Mistral-7B-Instruct-v0.2"
+# Hugging Face configuration - using a smaller, faster model
+HF_MODEL = "google/flan-t5-large"
 HF_API_URL = f"https://api-inference.huggingface.co/models/{HF_MODEL}"
 
 async def query_huggingface(prompt: str) -> str:
@@ -20,15 +20,28 @@ async def query_huggingface(prompt: str) -> str:
     async with httpx.AsyncClient(timeout=90.0) as client:
         response = await client.post(HF_API_URL, headers=headers, json=payload)
 
+    print(f"🔍 DEBUG: HF response status: {response.status_code}")
+    print(f"🔍 DEBUG: HF response headers: {dict(response.headers)}")
+    print(f"🔍 DEBUG: HF response text: {response.text[:500]}...")
+
     # Parse response safely
     try:
+        if response.status_code != 200:
+            raise RuntimeError(f"Hugging Face API returned status {response.status_code}: {response.text}")
+        
         data = response.json()
+        print(f"🔍 DEBUG: HF parsed data: {data}")
+        
         if isinstance(data, list) and len(data) > 0 and "generated_text" in data[0]:
             return data[0]["generated_text"].strip()
         elif isinstance(data, dict) and "error" in data:
             raise RuntimeError(f"Hugging Face API error: {data['error']}")
         else:
             return str(data)
+    except json.JSONDecodeError as e:
+        print(f"DEBUG: JSON decode error: {e}")
+        print(f"DEBUG: Raw response: {response.text}")
+        raise RuntimeError(f"Error parsing Hugging Face response: {e}. Raw response: {response.text}")
     except Exception as e:
         raise RuntimeError(f"Error parsing Hugging Face response: {e}")
 
@@ -37,7 +50,7 @@ async def generate_training_recommendations(running_activities: List[Dict[str, A
     print(f"🔍 DEBUG: RAG service called with {len(running_activities)} activities")
     
     if not running_activities:
-        print("❌ DEBUG: No running activities provided")
+        print("DEBUG: No running activities provided")
         return {"error": "No training data available"}
     
     try:
@@ -131,12 +144,12 @@ Return as JSON with this structure:
         
         try:
             recommendations = json.loads(plan_text)
-            print(f"🎉 DEBUG: Successfully parsed JSON response")
+            print(f"DEBUG: Successfully parsed JSON response")
             return recommendations
         except json.JSONDecodeError as e:
-            print(f"❌ DEBUG: JSON parsing failed: {e}")
+            print(f"DEBUG: JSON parsing failed: {e}")
             return {"error": "Failed to generate recommendations", "raw_response": plan_text}
     
     except Exception as e:
-        print(f"💥 DEBUG: Exception occurred: {type(e).__name__}: {str(e)}")
+        print(f"DEBUG: Exception occurred: {type(e).__name__}: {str(e)}")
         return {"error": f"AI system error: {str(e)}"}
