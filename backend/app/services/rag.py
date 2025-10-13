@@ -61,6 +61,10 @@ async def generate_training_recommendations(running_activities: List[Dict[str, A
         total_distance = sum(act.get("distance", 0) for act in recent_activities) / 1000
         total_time = sum(act.get("moving_time", 0) for act in recent_activities) / 60
         
+        # Calculate averages for prompt
+        avg_distance = total_distance / len(recent_activities) if recent_activities else 0
+        weekly_volume = total_distance / 2  # 2 weeks of data
+        
         # Create historical context from all activities
         historical_summary = f"Total activities: {len(running_activities)} runs\n"
         historical_summary += (f"Recent 2 weeks: {len(recent_activities)} runs, "
