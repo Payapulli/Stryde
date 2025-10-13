@@ -20,9 +20,9 @@ async def query_huggingface(prompt: str) -> str:
     async with httpx.AsyncClient(timeout=90.0) as client:
         response = await client.post(HF_API_URL, headers=headers, json=payload)
 
-    print(f"🔍 DEBUG: HF response status: {response.status_code}")
-    print(f"🔍 DEBUG: HF response headers: {dict(response.headers)}")
-    print(f"🔍 DEBUG: HF response text: {response.text[:500]}...")
+    print(f"DEBUG: HF response status: {response.status_code}")
+    print(f"DEBUG: HF response headers: {dict(response.headers)}")
+    print(f"DEBUG: HF response text: {response.text[:500]}...")
 
     # Parse response safely
     try:
@@ -30,7 +30,7 @@ async def query_huggingface(prompt: str) -> str:
             raise RuntimeError(f"Hugging Face API returned status {response.status_code}: {response.text}")
         
         data = response.json()
-        print(f"🔍 DEBUG: HF parsed data: {data}")
+        print(f"DEBUG: HF parsed data: {data}")
         
         if isinstance(data, list) and len(data) > 0 and "generated_text" in data[0]:
             return data[0]["generated_text"].strip()
@@ -47,7 +47,7 @@ async def query_huggingface(prompt: str) -> str:
 
 async def generate_training_recommendations(running_activities: List[Dict[str, Any]]):
     """Generate personalized training calendar using Hugging Face AI"""
-    print(f"🔍 DEBUG: RAG service called with {len(running_activities)} activities")
+    print(f"DEBUG: RAG service called with {len(running_activities)} activities")
     
     if not running_activities:
         print("DEBUG: No running activities provided")
@@ -74,7 +74,7 @@ async def generate_training_recommendations(running_activities: List[Dict[str, A
             historical_summary += f"Average pace: {avg_pace_min_km:.1f} min/km\n"
         
         # Generate recommendations using Hugging Face
-        print(f"🤖 DEBUG: Creating Hugging Face prompt...")
+        print(f"DEBUG: Creating Hugging Face prompt...")
         
         prompt = f"""Based on this runner's training data, generate a personalized weekly training calendar.
 
@@ -136,11 +136,11 @@ Return as JSON with this structure:
     ]
 }}"""
         
-        print(f"🚀 DEBUG: Making API call to Hugging Face...")
+        print(f"DEBUG: Making API call to Hugging Face...")
         plan_text = await query_huggingface(prompt)
         
-        print(f"✅ DEBUG: Hugging Face API call successful!")
-        print(f"📄 DEBUG: Response received: {len(plan_text)} characters")
+        print(f"DEBUG: Hugging Face API call successful!")
+        print(f"DEBUG: Response received: {len(plan_text)} characters")
         
         try:
             recommendations = json.loads(plan_text)
