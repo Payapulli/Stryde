@@ -82,7 +82,7 @@ async def generate_training_recommendations(running_activities: List[Dict[str, A
         
         prompt = f"""Create a 7-day running training plan for a runner who averages {avg_distance:.1f}km per run and runs {weekly_volume:.1f}km per week. 
 
-Recent training: {recent_summary}
+Recent training: {historical_summary}
 
 Generate a structured weekly plan with easy runs, intervals, tempo runs, and a long run. Include rest days and progression. Format as JSON with day, workout type, distance, and effort level."""
         
