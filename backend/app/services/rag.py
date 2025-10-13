@@ -4,8 +4,8 @@ import httpx
 from typing import List, Dict, Any
 from openai import OpenAI
 
-# Hugging Face configuration - using a smaller, faster model
-HF_MODEL = "google/flan-t5-large"
+# Hugging Face configuration - using a reliable text generation model
+HF_MODEL = "gpt2"
 HF_API_URL = f"https://api-inference.huggingface.co/models/{HF_MODEL}"
 
 async def query_huggingface(prompt: str) -> str:
@@ -76,65 +76,11 @@ async def generate_training_recommendations(running_activities: List[Dict[str, A
         # Generate recommendations using Hugging Face
         print(f"DEBUG: Creating Hugging Face prompt...")
         
-        prompt = f"""Based on this runner's training data, generate a personalized weekly training calendar.
+        prompt = f"""Create a 7-day running training plan for a runner who averages {avg_distance:.1f}km per run and runs {weekly_volume:.1f}km per week. 
 
-Training Summary:
-{historical_summary}
+Recent training: {recent_summary}
 
-Generate a 7-day calendar with specific workout recommendations. Consider:
-- Recovery needs based on their training load
-- Intensity balance (easy vs hard runs)
-- Volume progression
-- Training consistency
-
-Return as JSON with this structure:
-{{
-    "week_of": "2024-10-07",
-    "days": [
-        {{
-            "day": "Monday",
-            "date": "2024-10-07",
-            "workout": "Rest Day",
-            "reason": "Based on your recent high volume, you need recovery"
-        }},
-        {{
-            "day": "Tuesday",
-            "date": "2024-10-08",
-            "workout": "Easy Run - 5K at conversational pace",
-            "reason": "Focus on aerobic base building"
-        }},
-        {{
-            "day": "Wednesday",
-            "date": "2024-10-09",
-            "workout": "Rest Day",
-            "reason": "Recovery between training days"
-        }},
-        {{
-            "day": "Thursday",
-            "date": "2024-10-10",
-            "workout": "Tempo Run - 1K warmup, 3K at 5K pace, 1K cooldown",
-            "reason": "Structured speed work for improvement"
-        }},
-        {{
-            "day": "Friday",
-            "date": "2024-10-11",
-            "workout": "Rest Day",
-            "reason": "Recovery before weekend long run"
-        }},
-        {{
-            "day": "Saturday",
-            "date": "2024-10-12",
-            "workout": "Long Run - 10K at easy pace",
-            "reason": "Build endurance and aerobic capacity"
-        }},
-        {{
-            "day": "Sunday",
-            "date": "2024-10-13",
-            "workout": "Easy Run - 3K recovery pace",
-            "reason": "Active recovery after long run"
-        }}
-    ]
-}}"""
+Generate a structured weekly plan with easy runs, intervals, tempo runs, and a long run. Include rest days and progression. Format as JSON with day, workout type, distance, and effort level."""
         
         print(f"DEBUG: Making API call to Hugging Face...")
         plan_text = await query_huggingface(prompt)
